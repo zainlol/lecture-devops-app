@@ -1,14 +1,14 @@
 import React, { Component, Fragment } from 'react';
-import AddTodo from './AddTodo/AddTodo'
-import ListTodo from './ListTodo/ListTodo'
-import PageLoader from './PageLoader/PageLoader'
-import Header from './Header/Header'
-import Login from './Login/Login'
-import { init } from '../utils/APICalls'
-import Signup from './Signup/Signup'
+import AddTodo from './components/AddTodo/AddTodo'
+import ListTodo from './components/ListTodo/ListTodo'
+import PageLoader from './components/PageLoader/PageLoader'
+import Header from './components/Header/Header'
+import Login from './components/Login/Login'
+import { init } from './utils/APICalls'
+import Signup from './components/Signup/Signup'
 import './App.css'
-import { updateTodo, deleteTodo, signout } from '../utils/APICalls'
-import { fillTodoRows } from '../utils/Helper'
+import { updateTodo, deleteTodo, signout } from './utils/APICalls'
+import { fillTodoRows } from './utils/Helper'
 
 class App extends Component {
   state = {
