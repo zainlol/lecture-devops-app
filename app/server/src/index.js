@@ -1,3 +1,5 @@
+const path = require( 'path' );
+
 const express = require('express')
 const cors = require('cors')
 const helmet = require('helmet')
@@ -11,7 +13,7 @@ const app = express()
 const port = process.env.PORT || 5000
 
 const corsOptions = {
-    origin: process.env.CLIENT,
+    origin: `http://localhost:${ port }`,
     credentials: true
 }
 
@@ -24,11 +26,14 @@ app.use(helmet())
 app.use(helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: ["'self'"],
+        styleSrc: ["'self' 'unsafe-inline'"],
+        scriptSrc: ["'self' 'unsafe-inline' 'unsafe-eval'"]
     }
 }))
 
 app.use(todoRoutes)
 app.use(userRoutes)
+app.use('/', express.static(path.join(__dirname,`./../../client/build`)));
 app.use(errorRoutes)
 
 app.listen(port, () => {
