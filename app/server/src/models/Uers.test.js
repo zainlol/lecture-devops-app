@@ -1,0 +1,42 @@
+const dbClientInstance_ = require( './../db/mongo.js' );
+
+const { model: Users } = require( './Users.js' );
+
+
+describe( 'Model: Users', ()=>{
+    beforeAll( async ()=>{
+        await dbClientInstance_;
+    });
+
+
+    const userData = {
+        name: 'myname',
+        email: 'myname@example.com',
+        password: 'mypassword'
+    };
+
+    test( 'creating a user', async ()=>{
+        const userData = {
+            name: 'myname',
+            email: 'myname@example.com',
+            password: 'mypassword'
+        };
+
+        const userDoc = await Users( userData );
+        await userDoc.save();
+
+        const userRecord = await Users.findOne({ email: userData.email });
+
+        const { password, ...userInfo } = userData;
+
+        expect( userRecord ).toEqual( expect.objectContaining( userInfo ) );
+    });
+
+
+    afterAll( async ()=>{
+        const dbClient = await dbClientInstance_;
+        const { connection } = dbClient;
+        await connection.dropDatabase();
+        await dbClient.disconnect();
+    });
+});

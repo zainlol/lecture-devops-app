@@ -6,7 +6,7 @@ routes.get('*', async (req, res) => {
     try {
 
         res.status(404).send({
-            error: "Invalid endpoint."
+            error: 'Not Found'
         })
     }
     catch (e) {

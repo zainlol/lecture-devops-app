@@ -1,5 +1,5 @@
 const express = require('express')
-const ToDos = require('../models/Todos-model')
+const { model: ToDos } = require('../models/Todos')
 const auth = require('../middlewares/auth')
 const routes = express.Router()
 
@@ -53,11 +53,11 @@ routes.patch('/todo/update', auth, async (req, res) => {
         return res.status(400).send({ error: 'Invalid fields to update!' })
     }
     const updateObj = {}
-    if (changedTodo.hasOwnProperty("important")) {
+    if (changedTodo.hasOwnProperty('important')) {
         updateObj.important = changedTodo.important
     }
 
-    if (changedTodo.hasOwnProperty("done")) {
+    if (changedTodo.hasOwnProperty('done')) {
         updateObj.done = changedTodo.done
     }
 

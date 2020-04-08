@@ -1,42 +1,57 @@
 const path = require( 'path' );
 
-const express = require('express')
-const cors = require('cors')
-const helmet = require('helmet')
-require('./db/mongoose')
-const todoRoutes = require('./routes/todo-routes')
-const userRoutes = require('./routes/user-routes')
-const errorRoutes = require('./routes/error-routes')
-let cookieParser = require('cookie-parser')
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const dbClientInstance_ = require('./db/mongo.js');
+const todoRoutes = require('./routes/todo');
+const userRoutes = require('./routes/user');
+const errorRoutes = require('./routes/error');
+let cookieParser = require('cookie-parser');
 
-const app = express()
-const port = process.env.PORT || 5000
+const app = express();
+const port = process.env.PORT || 5000;
 
 const corsOptions = {
     origin: `http://localhost:${ port }`,
     credentials: true
-}
+};
 
-app.use(express.json())
-app.use(cors(corsOptions))
+app.use(express.json());
+app.use(cors(corsOptions));
 
-app.use(cookieParser())
+app.use(cookieParser());
 
-app.use(helmet())
+app.use(helmet());
 app.use(helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: ["'self'"],
         styleSrc: ["'self' 'unsafe-inline'"],
         scriptSrc: ["'self' 'unsafe-inline' 'unsafe-eval'"]
     }
-}))
+}));
 
-app.use(todoRoutes)
-app.use(userRoutes)
+app.use(todoRoutes);
+app.use(userRoutes);
 app.use('/', express.static(path.join(__dirname,`./../../client/build`)));
-app.use(errorRoutes)
+app.use(errorRoutes);
 
-app.listen(port, () => {
-    console.log('ToDo server is up on port ' + port)
-})
 
+(async function main(){
+    try{
+        const dbClient = await dbClientInstance_;
+        process.on( 'exit', ()=>{
+            dbClient.disconnect();
+        });
+
+        await new Promise( (__ful, rej__ )=>{
+            app.listen(port, function(){
+                console.log( `ToDo server is up on port ${ port }`);
+                __ful();
+            }).on( 'error', rej__);
+        });
+    }catch(e){
+        console.error( new Error( `Cannot connect to database ${ process.env.MONGODB_URL }` ) );
+        process.exit( 1 );
+    }
+})();

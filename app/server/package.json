@@ -5,10 +5,13 @@
   "license": "MIT",
   "scripts": {
     "start": "node src/index",
-    "dev": "env-cmd -f ./dev.env nodemon src/index"
+    "dev": "env-cmd -f ./dev.env nodemon src/index",
+    "test": "env-cmd -f ./dev.env jest --ci"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^1.1.5",
     "env-cmd": "^10.1.0",
+    "jest": "^25.1.0",
     "nodemon": "^2.0.2"
   },
   "dependencies": {
