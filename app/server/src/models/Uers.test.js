@@ -5,15 +5,14 @@ const { model: Users } = require( './Users.js' );
 
 describe( 'Model: Users', ()=>{
     beforeAll( async ()=>{
-        await dbClientInstance_;
+        try{
+            await dbClientInstance_;
+        }catch( err ){
+            console.error( new Error( `Cannot connect to database: ${ process.env.MONGODB_URL }` ) );
+            process.exit( 1 );
+        }
     });
 
-
-    const userData = {
-        name: 'myname',
-        email: 'myname@example.com',
-        password: 'mypassword'
-    };
 
     test( 'creating a user', async ()=>{
         const userData = {

@@ -39,19 +39,14 @@ app.use(errorRoutes);
 
 (async function main(){
     try{
-        const dbClient = await dbClientInstance_;
-        process.on( 'exit', ()=>{
-            dbClient.disconnect();
-        });
-
         await new Promise( (__ful, rej__ )=>{
             app.listen(port, function(){
                 console.log( `ToDo server is up on port ${ port }`);
                 __ful();
             }).on( 'error', rej__);
         });
-    }catch(e){
-        console.error( new Error( `Cannot connect to database ${ process.env.MONGODB_URL }` ) );
+    }catch( err ){
+        console.error( err );
         process.exit( 1 );
     }
 })();
