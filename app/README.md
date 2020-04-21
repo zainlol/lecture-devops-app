@@ -1,12 +1,34 @@
-# React, Node Js, and MongoDB microservices-based application deployment on Kubernetes
+Todo-App
+========
 
-This complete article can be check at [medium.com/@aamirpinger](https://medium.com/@aamirpinger/react-express-node-js-and-mongodb-mern-stack-microservices-based-application-deployment-on-ec4607cec74d)
 
-This is a simple ToDo application build using MERN Stack. It consist of:
-1. The Front-end application is build using React.
-2. The backend is build using Node Js, Express, and mongoose.
-3. The Database Layer will be using the NoSQL database i.e. MongoDB.
+This application functions as the deployable workload for the lecture: [*DevOps*](https://github.com/lucendio/lecture-devops-material) 
 
-As a brief overview of this todo app, when the user will access the front-end application from the browser, a login screen with a signup option appears. User must first signup to register and then after having success on signup can login into the app by using registered email and the password.
+The application consists of two parts:
 
-After a successful login, user will then add a new Todo task and list already added todos. Users can also mark any specific ToDo as important by clicking on the star, mark them as completed, and delete any specific ToDo when needed. Users may also use the ToDo search option and sort the paginated list on serial no, title, or description.
+* frontend (`./client`)
+* backend (`./server`)
+
+and utilizes the following technologies (a.k.a MERN-stack):
+
+* React (rendering engine of the web-based graphical user interface)
+* Express (web-server framework)
+* Node (Javascript runtime in the backend)
+* MongoDB (persistence layer)
+
+Other, most noticeable dependencies are:
+
+* [Jest](https://jestjs.io/) as the test framework for both parts
+* [ESLint](https://eslint.org/) for code quality (linting)
+* [Webpack](https://webpack.js.org/) to bundle the fronend
+* [Babel](https://babeljs.io/) to transpile and therewith support latest Ecmascript versions
+* [Mongoose](https://mongoosejs.com/docs/api.html) as the database driver
+ 
+
+*Please see the `scripts` sections in the respective `package.json` files to find out which commands are available for
+each parts.*
+
+
+##### Full disclosure
+
+This application was forked from [Aamir Pinger](https://github.com/aamirpinger)'s [ToDo app][https://github.com/aamirpinger/todo-app-client-server-kubernetes]
