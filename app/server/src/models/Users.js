@@ -48,7 +48,7 @@ schema.pre('save', async function (next) {
 });
 
 schema.statics.findByCredentials = async (email, password) => {
-    const user = await Users.findOne({ email });
+    const user = await model.findOne({ email });
 
     if (!user) {
         throw new Error('Unable to login');
@@ -84,7 +84,7 @@ schema.methods.toJSON = function () {
     delete publicUserData.tokens;
 
     return publicUserData
-}
+};
 
 const model = mongoose.model( 'Users', schema );
 
