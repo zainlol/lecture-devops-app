@@ -8,9 +8,17 @@ This repository contains the [application](./app/README.md) that should be used 
 
 ### Getting started 
 
-For more information on the app, please have a look into its [README](./app/README.md).
+For more information regarding the app, please have a look into its [README](./app/README.md).
+
 The `Makefile` is the main entry point for this repository. It's meant to be used for documentation purposes and local
- invokation only. The following the following commands are available:
+development/invocation only. The following commands are available:
+
+
+#### `make install-stack`
+
+* install technology stack (nodejs, npm, mongodb) locally within the project
+* in order for the application-related targets to pick up these binaries, the `PATH` variable is adjusted and exported
+  for the corresponding target
 
 
 #### `make install-deps`

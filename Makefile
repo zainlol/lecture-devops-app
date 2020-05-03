@@ -10,52 +10,74 @@ BIN_DIR = $(LOCAL_DIR)/bin
 TEMP_DIR = $(LOCAL_DIR)/tmp
 DATA_DIR = $(LOCAL_DIR)/data
 LOG_DIR = $(LOCAL_DIR)/logs
+STACK_DIR = $(MKFILE_DIR)/stack
+
+APP_NODE_MODULE_DIRS = $(foreach dir, client server, $(subst %,$(dir),$(MKFILE_DIR)/app/%/node_modules))
+
+
+
+NODEJS_VERSION ?= 12.16.3
+NPM_VERSION ?= 6.14.4
+MONGODB_VERSION ?= 4.2.6
+REACT_APP_VERSION = 3.4.1
 
 
 
 PLATFORM := $(shell if echo $$OSTYPE | grep -q darwin; then echo darwin; else echo linux; fi)
 
 
-
-MONGO_VERSION =
-MONGO_URL =
-
-
-REACT_APP_VERSION = '3.4.1'
-
+NODEJS_URL = https://nodejs.org/dist/v$(NODEJS_VERSION)/node-v$(NODEJS_VERSION)-$(PLATFORM)-x64.tar.gz
+NODEJS_ARTIFACT = $(TEMP_DIR)/node-v$(NODEJS_VERSION)-$(PLATFORM)-x64.tar.gz
+NODEJS_BIN = $(BIN_DIR)/node
+NPM_BIN = $(BIN_DIR)/npm
+NODEJS_SHA256 ?= $(shell cat $(STACK_DIR)/versions/nodejs.256.sums | grep v$(NODEJS_VERSION)-$(PLATFORM)-x64 | awk '{ print $$ 2 }')
 
 
-
-install-stack:
-	echo '# mongo'
-	echo '# node'
-	echo '# npm'
-
-install-deps:
-	cd $(MKFILE_DIR)/app/client \
-	&& npm install
-	cd $(MKFILE_DIR)/app/server \
-	&& npm install
+ifeq ($(PLATFORM), darwin)
+MONGODB_URL = https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-$(MONGODB_VERSION).tgz
+else ifeq ($(PLATFORM), linux)
+# NOTE: hard-coded Debian version. Others can be found here: https://www.mongodb.com/download-center/community
+MONGODB_URL = https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian10-$(MONGODB_VERSION).tgz
+else
+	fail 'Unknown platform. No condition met'
+endif
+MONGODB_ARTIFACT = $(TEMP_DIR)/mongodb-$(PLATFORM)-$(MONGODB_VERSION).tar.gz
+MONGODB_BIN = $(BIN_DIR)/mongod
+MONGODB_SHA256 ?= $(shell cat $(STACK_DIR)/versions/mongodb.256.sums | grep $(PLATFORM)-x86_64-$(MONGODB_VERSION) | awk '{ print $$ 2 }')
 
 
 
-run-db:
-	mkdir -p $(LOG_DIR) $(DATA_DIR)/db
-	mongod --config ./conf/mongod.conf
 
 
-build:
-	cd $(MKFILE_DIR)/app/client \
-	&& rm -rf ./build \
-	&& PUBLIC_URL=http://localhost:3000 \
-	npm run build
+default: all
+
+all: install-stack install-deps
 
 
+
+install-stack: node npm mongod
+
+
+install-deps: $(APP_NODE_MODULE_DIRS)
+
+
+
+.PHONY: run-db
+run-db: export PATH := $(BIN_DIR):$(PATH)
+run-db: | $(LOG_DIR)/ $(DATA_DIR)/
+	mkdir -p $(DATA_DIR)/db
+	mongod --config $(STACK_DIR)/mongod.conf
+
+
+.PHONY: run-local
+run-local: export PATH := $(BIN_DIR):$(PATH)
 run-local:
 	cd $(MKFILE_DIR)/app/server \
 	&& npm run dev
 
 
+.PHONY: test
+test: export PATH := $(BIN_DIR):$(PATH)
 test:
 	cd $(MKFILE_DIR)/app/client \
 	&& npm run test
@@ -63,16 +85,114 @@ test:
 	&& npm run test
 
 
-
+.PHONY: test-local
+test-local: export PATH := $(BIN_DIR):$(PATH)
 test-local:
 	cd $(MKFILE_DIR)/app/client \
 	&& npm run test:dev
+
+
+.PHONY: build
+build: export PATH := $(BIN_DIR):$(PATH)
+build:
+	cd $(MKFILE_DIR)/app/client \
+	&& rm -rf ./build \
+	&& PUBLIC_URL=http://localhost:3000 \
+	npm run build
+
+
+
+.PHONY: clean
+clean: clean-stack clean-modules
+
+
+
+
+$(LOCAL_DIR)/%/:
+	mkdir -p $(@)
+
+
+.PHONY: node
+node: $(NODEJS_BIN)
+$(NODEJS_BIN): | $(NODEJS_ARTIFACT) $(BIN_DIR)/
+	@ [ $$(openssl dgst -sha256 "$(NODEJS_ARTIFACT)" | awk '{ print $$ 2 }') == $(NODEJS_SHA256) ] || ( echo "Invalid SHA256." && rm $(NODEJS_ARTIFACT) && exit 1 )
+	tar \
+		--extract \
+		--verbose \
+		--strip-components 2 \
+		--directory "$(BIN_DIR)" \
+		--file "$(NODEJS_ARTIFACT)" \
+		node-*/bin/node
+	chmod +x "$@"
+
+$(NODEJS_ARTIFACT): | $(TEMP_DIR)/
+	curl \
+		--silent --show-error \
+		--location \
+		$(NODEJS_URL) \
+		> $(NODEJS_ARTIFACT)
+
+.PHONY: npm
+npm: $(NPM_BIN)
+npm: export PATH := $(BIN_DIR):$(PATH)
+$(NPM_BIN): | $(NODEJS_BIN)
+	tar \
+		--extract \
+		--verbose \
+		--strip-components 2 \
+		--directory "$(BIN_DIR)" \
+		--file "$(NODEJS_ARTIFACT)" \
+		node-*/bin/npm
+	chmod +x "$@"
+	npm install -g npm@$(NPM_VERSION)
+
+
+.PHONY: mongod
+mongod: $(MONGODB_BIN)
+$(MONGODB_BIN): | $(MONGODB_ARTIFACT) $(BIN_DIR)/
+	@ [ $$(openssl dgst -sha256 "$(MONGODB_ARTIFACT)" | awk '{ print $$ 2 }') == $(MONGODB_SHA256) ] || ( echo "Invalid SHA256." && rm $(MONGODB_ARTIFACT) && exit 1 )
+	tar \
+		--extract \
+		--verbose \
+		--strip-components 2 \
+		--directory "$(BIN_DIR)" \
+		--file "$(MONGODB_ARTIFACT)" \
+		mongodb-*/bin/mongod
+	chmod +x "$@"
+
+$(MONGODB_ARTIFACT): | $(TEMP_DIR)/
+	curl \
+		--silent --show-error \
+		--location \
+		$(MONGODB_URL) \
+		> $(MONGODB_ARTIFACT)
+
+
+.PHONY: clean-stack
+clean-stack:
+	rm -rf \
+		$(LOCAL_DIR)
+
+
+
+.PHONY: $(APP_NODE_MODULE_DIRS)
+$(APP_NODE_MODULE_DIRS): export PATH := $(BIN_DIR):$(PATH)
+$(APP_NODE_MODULE_DIRS): $(MKFILE_DIR)/app/%/node_modules:
+	cd $(@D) \
+	&& npm install
+
+.PHONY: clean-modules
+clean-modules:
+	for nodeModulesDir in $(APP_NODE_MODULE_DIRS); do \
+		rm -rf "$${nodeModulesDir}"; \
+	done
 
 
 
 
 
 .PHONY: update-react-app-template
+update-react-app-template: export PATH := $(BIN_DIR):$(PATH)
 update-react-app-template:
 	rm -rf $(TEMP_DIR)/npm-project-scope
 	mkdir -p $(TEMP_DIR)/npm-project-scope
