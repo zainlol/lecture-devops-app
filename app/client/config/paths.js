@@ -21,6 +21,15 @@ const publicUrlOrPath = getPublicUrlOrPath(
   process.env.PUBLIC_URL
 );
 
+// NOTE: env var supersedes default
+//
+const defaultBuildPath = resolveApp('./build');
+const { BUILD_PATH = defaultBuildPath } = process.env;
+if( BUILD_PATH.length <= 0 ){
+    process.error( new Error(`environment variable 'BUILD_PATH' is defined but empty`) );
+}
+const buildPath = path.resolve( BUILD_PATH );
+
 const moduleFileExtensions = [
   'web.mjs',
   'mjs',
@@ -52,7 +61,7 @@ const resolveModule = (resolveFn, filePath) => {
 module.exports = {
   dotenv: resolveApp('.env'),
   appPath: resolveApp('.'),
-  appBuild: resolveApp('build'),
+  appBuild: buildPath,
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
   appIndexJs: resolveModule(resolveApp, 'src/index'),
