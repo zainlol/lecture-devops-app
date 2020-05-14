@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node src/index",
-    "dev": "env-cmd -f ./dev.env nodemon src/index",
-    "test": "env-cmd -f ./dev.env jest --ci"
+    "start": "env-cmd -f ./dev.env nodemon src/index.js",
+    "test": "jest --ci",
+    "test:dev": "env-cmd -f ./dev.env jest"
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.1.5",

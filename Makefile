@@ -47,6 +47,10 @@ MONGODB_SHA256 ?= $(shell cat $(STACK_DIR)/versions/mongodb.256.sums | grep $(PL
 
 
 
+SERVER_PUBLIC_URL ?= http://localhost:3000
+CLIENT_BUILD_PATH ?= $(MKFILE_DIR)/app/server/src/public
+
+
 
 
 default: all
@@ -66,28 +70,32 @@ install-deps: $(APP_NODE_MODULE_DIRS)
 run-db: export PATH := $(BIN_DIR):$(PATH)
 run-db: | $(LOG_DIR)/ $(DATA_DIR)/
 	mkdir -p $(DATA_DIR)/db
-	mongod --config $(STACK_DIR)/mongod.conf
+	mongod --config $(STACK_DIR)/local.mongod.conf
 
 
 .PHONY: run-local
 run-local: export PATH := $(BIN_DIR):$(PATH)
-run-local:
+run-local: build
 	cd $(MKFILE_DIR)/app/server \
-	&& npm run dev
+	&& npm start
 
 
 .PHONY: test
 test: export PATH := $(BIN_DIR):$(PATH)
+test: randomString = $(shell LC_ALL=C tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 32 | head -n 1)
 test:
 	cd $(MKFILE_DIR)/app/client \
 	&& npm run test
 	cd $(MKFILE_DIR)/app/server \
+	PORT=3002 \
+    MONGODB_URL=mongodb://localhost:27017/$(randomString) \
+    JWT_SECRET=$(randomString) \
 	&& npm run test
 
 
-.PHONY: test-local
-test-local: export PATH := $(BIN_DIR):$(PATH)
-test-local:
+.PHONY: test-client-local
+test-client-local: export PATH := $(BIN_DIR):$(PATH)
+test-client-local:
 	cd $(MKFILE_DIR)/app/client \
 	&& npm run test:dev
 
@@ -95,15 +103,42 @@ test-local:
 .PHONY: build
 build: export PATH := $(BIN_DIR):$(PATH)
 build:
+	rm -rf $(CLIENT_BUILD_PATH)
 	cd $(MKFILE_DIR)/app/client \
-	&& rm -rf ./build \
-	&& PUBLIC_URL=http://localhost:3000 \
-	npm run build
+	&& PUBLIC_URL=$(SERVER_PUBLIC_URL) \
+		BUILD_PATH=$(CLIENT_BUILD_PATH) \
+		node ./scripts/build.js
 
 
 
 .PHONY: clean
 clean: clean-stack clean-modules
+
+
+
+
+.PHONY: start
+start: export PATH := $(BIN_DIR):$(PATH)
+start: SERVER_PUBLIC_URL = http://localhost:3001
+start: build
+start: | $(DATA_DIR)/ $(LOG_DIR)/
+	mkdir -p $(DATA_DIR)/db
+
+	(exec mongod \
+		--port 27017 \
+		--bind_ip localhost \
+		--logpath /dev/stdout \
+		--dbpath $(DATA_DIR)/db \
+	) & PIDS[1]=$$!; \
+	\
+	(PORT=3001 \
+	MONGODB_URL=mongodb://localhost:27017/todo-app \
+	JWT_SECRET=myjwtsecret \
+	exec node $(MKFILE_DIR)/app/server/src/index.js \
+	) & PIDS[2]=$$!; \
+	\
+	for PID in $${PIDS[*]}; do wait $${PID}; done;
+
 
 
 
