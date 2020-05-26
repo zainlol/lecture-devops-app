@@ -156,7 +156,6 @@ $(NODEJS_BIN): | $(NODEJS_ARTIFACT) $(BIN_DIR)/
 		--verbose \
 		--strip-components 2 \
 		--directory "$(BIN_DIR)" \
-		--wildcards \
 		--file "$(NODEJS_ARTIFACT)" \
 		node-*/bin/node
 	chmod +x "$@"
@@ -177,7 +176,6 @@ $(NPM_BIN): | $(NODEJS_BIN)
 		--verbose \
 		--strip-components 2 \
 		--directory "$(BIN_DIR)" \
-		--wildcards \
 		--file "$(NODEJS_ARTIFACT)" \
 		node-*/bin/npm
 	chmod +x "$@"
@@ -193,7 +191,6 @@ $(MONGODB_BIN): | $(MONGODB_ARTIFACT) $(BIN_DIR)/
 		--verbose \
 		--strip-components 2 \
 		--directory "$(BIN_DIR)" \
-		--wildcards \
 		--file "$(MONGODB_ARTIFACT)" \
 		mongodb-*/bin/mongod
 	chmod +x "$@"
