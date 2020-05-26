@@ -159,7 +159,7 @@ $(NODEJS_BIN): | $(NODEJS_ARTIFACT) $(BIN_DIR)/
 		--wildcards \
 		--file "$(NODEJS_ARTIFACT)" \
 		node-*/bin/node
-	chmod +x "$@"
+	
 
 $(NODEJS_ARTIFACT): | $(TEMP_DIR)/
 	curl \
@@ -180,7 +180,7 @@ $(NPM_BIN): | $(NODEJS_BIN)
 		--wildcards \
 		--file "$(NODEJS_ARTIFACT)" \
 		node-*/bin/npm
-	chmod +x "$@"
+	
 	npm install -g npm@$(NPM_VERSION)
 
 
@@ -196,7 +196,7 @@ $(MONGODB_BIN): | $(MONGODB_ARTIFACT) $(BIN_DIR)/
 		--wildcards \
 		--file "$(MONGODB_ARTIFACT)" \
 		mongodb-*/bin/mongod
-	chmod +x "$@"
+	
 
 $(MONGODB_ARTIFACT): | $(TEMP_DIR)/
 	curl \
