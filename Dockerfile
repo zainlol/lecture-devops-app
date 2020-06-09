@@ -5,3 +5,4 @@ RUN apk add curl
 RUN apk add openssl
 COPY . .
 RUN make
+CMD ["make","start"]
