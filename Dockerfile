@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM mhart/alpine-node
 RUN apk add bash
 RUN apk add make
 RUN apk add curl
