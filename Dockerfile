@@ -1,6 +1,4 @@
-# Use a lighter version of Node as a parent image
-FROM mhart/alpine-node:8.11.4
-# Set the working directory to /app/server
-RUN apk add make
+FROM alpine:3.7
+RUN apk add --no-cache make
 RUN make install-deps 
 RUN make run-local
