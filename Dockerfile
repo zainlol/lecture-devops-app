@@ -4,6 +4,4 @@ RUN apk add make
 RUN apk add curl
 RUN apk add openssl
 COPY . .
-RUN make install-stack
-RUN make install-deps 
-RUN make run-local
+RUN make
