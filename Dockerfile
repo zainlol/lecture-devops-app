@@ -7,4 +7,7 @@ RUN npm install
 RUN npm run build 
 RUN mv build /lecture-devops-app/app/server/src/public
 RUN npm install /lecture-devops-app/app/server
+
+EXPOSE 3000
+
 CMD ["npm", "start", "/lecture-devops-app/app/server"]
