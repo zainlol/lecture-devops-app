@@ -9,4 +9,9 @@ RUN mv build /lecture-devops-app/app/server/src/public
 RUN npm install /lecture-devops-app/app/server
 WORKDIR /lecture-devops-app/app/server
 EXPOSE 3000
-CMD [ "/bin/sh", "-c" , "npm start dev.env" ]
+
+ENV PORT=3000
+ENV MONGODB_URL=mongodb://localhost:27017/todo-app
+ENV JWT_SECRET=myjwtsecret
+
+CMD [ "/bin/sh", "-c" , "npm start" ]
