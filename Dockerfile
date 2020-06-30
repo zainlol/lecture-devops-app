@@ -12,4 +12,4 @@ EXPOSE 3000
 
 RUN npm install env-cmd
 
-CMD [ "/bin/sh", "-c" , "npm start" ]
+CMD [ "/bin/sh", "-c" , "npm start --silent" ]
