@@ -9,4 +9,4 @@ RUN mv build /lecture-devops-app/app/server/src/public
 RUN npm install /lecture-devops-app/app/server
 WORKDIR /lecture-devops-app/app/server
 EXPOSE 3000
-CMD [ "/bin/sh", "-c" , "npm", "start" ]
+CMD [ "/bin/sh", "-c" , "npm start" ]
