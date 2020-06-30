@@ -6,5 +6,5 @@ WORKDIR lecture-devops-app/app/client
 RUN npm install 
 RUN npm run build 
 RUN mv build /lecture-devops-app/app/server/src/public
-RUN npm install /lecture-devops-app/app/server/
-CMD ["node", "/lecture-devops-app/app/server/src/index.js"]
+RUN npm install /lecture-devops-app/app/server
+CMD ["npm", "start", "/lecture-devops-app/app/server"]
