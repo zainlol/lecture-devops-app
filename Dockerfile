@@ -10,8 +10,6 @@ RUN npm install /lecture-devops-app/app/server
 WORKDIR /lecture-devops-app/app/server
 EXPOSE 3000
 
-ENV PORT=3000
-ENV MONGODB_URL=mongodb://localhost:27017/todo-app
-ENV JWT_SECRET=myjwtsecret
+RUN npm install env-cmd
 
 CMD [ "/bin/sh", "-c" , "npm start" ]
