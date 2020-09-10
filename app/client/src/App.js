@@ -50,7 +50,6 @@ class App extends Component {
     ))
   }
 
-
   handleImportant = (index, id) => {
     updateTodo(id, !this.state.todos[index].important)
       .then(todo => {

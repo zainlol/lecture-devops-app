@@ -28,12 +28,20 @@ class Signup extends Component {
             invalidEmail: false
         })
     }
+
     handlePasswordInput = (e) => {
         this.setState({
             password: e.target.value,
             emptyPassword: false
         })
     }
+
+    onEnter = (e) => {
+        if (e.charCode === 13) {
+          this.handleSubmit();
+        }
+      }
+
     validate = () => {
         let invalid = false
         if (this.state.name.trim() === '') {
@@ -64,7 +72,7 @@ class Signup extends Component {
                     if (error.data.errmsg) {
                         err = error.data.errmsg
                     }
-                    else if (error.data.errors.password) {
+                    else if (error.data.errors.password) {r
                         err = "Invalid Password, must be atleast 7 letters."
                     }
                     else {
@@ -127,6 +135,7 @@ class Signup extends Component {
                                 validate
                                 value={this.state.password}
                                 onChange={this.handlePasswordInput}
+                                onKeyPress={this.onEnter}
                                 size={(this.state.emptyPassword) ? "lg inputErrorDiv" : "lg"}
                                 className={(this.state.emptyPassword) ? "inputError" : ""}
                             />

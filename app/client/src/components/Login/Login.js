@@ -14,13 +14,13 @@ class Login extends Component {
         errMsg: ''
     }
 
-
     handleEmailInput = (e) => {
         this.setState({
             email: e.target.value,
             invalidEmail: false
         })
     }
+    
     handlePasswordInput = (e) => {
         this.setState({
             password: e.target.value,
@@ -40,7 +40,11 @@ class Login extends Component {
         return invalid
     }
 
-
+    onEnter = (e) => {
+        if (e.charCode === 13) {
+          this.handleSubmit();
+        }
+      }
 
     handleSubmit = () => {
         const invalidField = this.validate()
@@ -101,6 +105,7 @@ class Login extends Component {
                                 validate
                                 value={this.state.password}
                                 onChange={this.handlePasswordInput}
+                                onKeyPress={this.handleSubmit}
                                 size={(this.state.emptyPassword) ? "lg inputErrorDiv" : "lg"}
                                 className={(this.state.emptyPassword) ? "inputError" : ""}
                             />
