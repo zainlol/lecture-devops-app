@@ -32,6 +32,28 @@ routes.post('/todo/add', auth, async (req, res) => {
 
 routes.post('/todo/list', auth, async (req, res) => {
     try {
+        if(req.body.done != undefined){
+            const todos = await ToDos.find({
+                user: req.user._id,
+                done: req.body.done
+            });
+            res.send(todos);
+        }
+        else{
+            const todos = await ToDos.find({
+                user: req.user._id
+            });
+            res.send(todos);
+        }        
+    }
+    catch (e) {
+        console.log(e);
+        res.status(500).send;
+    }
+});
+
+routes.post('/todo/list', auth, async (req, res) => {
+    try {
 
         const todos = await ToDos.find({
             user: req.user._id
@@ -40,6 +62,7 @@ routes.post('/todo/list', auth, async (req, res) => {
         res.send(todos);
     }
     catch (e) {
+        console.log(e);
         res.status(500).send;
     }
 });

@@ -72,7 +72,7 @@ class Signup extends Component {
                     if (error.data.errmsg) {
                         err = error.data.errmsg
                     }
-                    else if (error.data.errors.password) {r
+                    else if (error.data.errors.password) {
                         err = "Invalid Password, must be atleast 7 letters."
                     }
                     else {

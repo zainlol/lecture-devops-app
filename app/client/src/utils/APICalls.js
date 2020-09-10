@@ -58,9 +58,9 @@ export const addTodo = (title, description) => {
     })
 }
 
-export const listTodo = () => {
+export const listTodo = (done = null) => {
     //I have used post instead of get, read https://blog.teamtreehouse.com/the-definitive-guide-to-get-vs-post
-    return axiosInstance.post('/todo/list').then(todos => {
+    return axiosInstance.post('/todo/list', {done}).then(todos => {
         return todos.data
     })
 }
